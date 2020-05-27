@@ -99,6 +99,7 @@ namespace NVM
 					case CMD_READ_PAGE_COPYBACK:
 					case CMD_READ_PAGE_COPYBACK_MULTIPLANE:
 						return _readLatency[latencyType] + _RBSignalDelayRead;
+					case CMD_READ_PAGE_SUB:
 					case CMD_PROGRAM_PAGE:
 					case CMD_PROGRAM_PAGE_MULTIPLANE:
 					case CMD_PROGRAM_PAGE_COPYBACK:

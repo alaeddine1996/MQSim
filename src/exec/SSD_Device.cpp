@@ -46,6 +46,15 @@ SSD_Device::SSD_Device(Device_Parameter_Set *parameters, std::vector<IO_Flow_Par
 			average_flash_read_latency = read_latencies[0];
 			average_flash_write_latency = write_latencies[0];
 			break;
+
+		case Flash_Technology_Type::SBP: //subpage read may require declaring a new flash type to implemement a new latency metrics
+		    read_latencies = new sim_time_type[1];
+			read_latencies[0] = parameters->Flash_Parameters.Page_Read_Latency_subpage;
+			write_latencies = new sim_time_type[1];
+			write_latencies[0] = parameters->Flash_Parameters.Page_Program_Latency_LSB;
+			average_flash_read_latency = read_latencies[0];
+			average_flash_write_latency = write_latencies[0];
+			break;
 		case Flash_Technology_Type::MLC:
 			read_latencies = new sim_time_type[2];
 			read_latencies[0] = parameters->Flash_Parameters.Page_Read_Latency_LSB;

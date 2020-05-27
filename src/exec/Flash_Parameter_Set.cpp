@@ -8,6 +8,7 @@ NVM::FlashMemory::Command_Suspension_Mode Flash_Parameter_Set::CMD_Suspension_Su
 sim_time_type Flash_Parameter_Set::Page_Read_Latency_LSB = 75000;
 sim_time_type Flash_Parameter_Set::Page_Read_Latency_CSB = 75000;
 sim_time_type Flash_Parameter_Set::Page_Read_Latency_MSB = 75000;
+sim_time_type Flash_Parameter_Set::Page_Read_Latency_subpage = 35000;
 sim_time_type Flash_Parameter_Set::Page_Program_Latency_LSB = 750000;
 sim_time_type Flash_Parameter_Set::Page_Program_Latency_CSB = 750000;
 sim_time_type Flash_Parameter_Set::Page_Program_Latency_MSB = 750000;
@@ -75,6 +76,12 @@ void Flash_Parameter_Set::XML_serialize(Utils::XmlWriter& xmlwriter)
 	attr = "Page_Read_Latency_MSB";
 	val = std::to_string(Page_Read_Latency_MSB);
 	xmlwriter.Write_attribute_string(attr, val);
+
+	//Subpage read requires a new latency attached to it refering to 4Kb read latency
+
+	attr = "Page_Read_Latency_subpage";
+	val = std::to_string(Page_Read_Latency_subpage);
+	xmlwriter.Write_attribute_string(attr, val)
 
 	attr = "Page_Program_Latency_LSB";
 	val = std::to_string(Page_Program_Latency_LSB);

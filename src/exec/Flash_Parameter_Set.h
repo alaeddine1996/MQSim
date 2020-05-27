@@ -13,6 +13,7 @@ public:
 	static sim_time_type Page_Read_Latency_LSB;
 	static sim_time_type Page_Read_Latency_CSB;
 	static sim_time_type Page_Read_Latency_MSB;
+	static sim_time_type Page_Read_Latency_subpage;
 	static sim_time_type Page_Program_Latency_LSB;
 	static sim_time_type Page_Program_Latency_CSB;
 	static sim_time_type Page_Program_Latency_MSB;
