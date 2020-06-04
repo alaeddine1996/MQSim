@@ -32,7 +32,7 @@ SSD_Device::SSD_Device(Device_Parameter_Set *parameters, std::vector<IO_Flow_Par
 	{
 	case NVM::NVM_Type::FLASH:
 	{
-		sim_time_type *read_latencies, *write_latencies, subpageReadLatency;
+		sim_time_type *read_latencies, *write_latencies, *subpage_read_latencies;
 		sim_time_type average_flash_read_latency = 0, average_flash_write_latency = 0; //Required for FTL initialization
 
 		//Step 1: create memory chips (flash chips in our case)
@@ -41,31 +41,37 @@ SSD_Device::SSD_Device(Device_Parameter_Set *parameters, std::vector<IO_Flow_Par
 		case Flash_Technology_Type::SLC:
 			read_latencies = new sim_time_type[1];
 			read_latencies[0] = parameters->Flash_Parameters.Page_Read_Latency_LSB;
-			subpageReadLatency = parameters->Flash_Parameters.Page_Read_Latency_subpage;
+			subpage_read_latencies = new sim_time_type[1];
+			subpage_read_latencies[0] = parameters->Flash_Parameters.Page_Read_Latency_Subpage_LSB;
 			write_latencies = new sim_time_type[1];
 			write_latencies[0] = parameters->Flash_Parameters.Page_Program_Latency_LSB;
 			average_flash_read_latency = read_latencies[0];
 			average_flash_write_latency = write_latencies[0];
 			break;
 
-		/*case Flash_Technology_Type::SBP: //subpage read may require declaring a new flash type to implemement a new latency metrics
-		    read_latencies = new sim_time_type[1];   // Temporary , just as a reminder that we have to make the device of two possible latencies one for full page and one for subpage read latency
-			*/
 		case Flash_Technology_Type::MLC:
 			read_latencies = new sim_time_type[2];
 			read_latencies[0] = parameters->Flash_Parameters.Page_Read_Latency_LSB;
 			read_latencies[1] = parameters->Flash_Parameters.Page_Read_Latency_MSB;
+			subpage_read_latencies = new sim_time_type[2];
+			subpage_read_latencies[0] = parameters->Flash_Parameters.Page_Read_Latency_Subpage_LSB;
+			subpage_read_latencies[1] = parameters->Flash_Parameters.Page_Read_Latency_Subpage_MSB;
 			write_latencies = new sim_time_type[2];
 			write_latencies[0] = parameters->Flash_Parameters.Page_Program_Latency_LSB;
 			write_latencies[1] = parameters->Flash_Parameters.Page_Program_Latency_MSB;
 			average_flash_read_latency = (read_latencies[0] + read_latencies[1]) / 2;
 			average_flash_write_latency = (write_latencies[0] + write_latencies[1]) / 2;
 			break;
+
 		case Flash_Technology_Type::TLC:
 			read_latencies = new sim_time_type[3];
 			read_latencies[0] = parameters->Flash_Parameters.Page_Read_Latency_LSB;
 			read_latencies[1] = parameters->Flash_Parameters.Page_Read_Latency_CSB;
 			read_latencies[2] = parameters->Flash_Parameters.Page_Read_Latency_MSB;
+			subpage_read_latencies = new sim_time_type[2];
+			subpage_read_latencies[0] = parameters->Flash_Parameters.Page_Read_Latency_Subpage_LSB;
+			subpage_read_latencies[1] = parameters->Flash_Parameters.Page_Read_Latency_Subpage_MSB;
+			subpage_read_latencies[2] = parameters->Flash_Parameters.Page_Read_Latency_Subpage_CSB;
 			write_latencies = new sim_time_type[3];
 			write_latencies[0] = parameters->Flash_Parameters.Page_Program_Latency_LSB;
 			write_latencies[1] = parameters->Flash_Parameters.Page_Program_Latency_CSB;
@@ -93,7 +99,7 @@ SSD_Device::SSD_Device(Device_Parameter_Set *parameters, std::vector<IO_Flow_Par
 					chips[chip_cntr] = new NVM::FlashMemory::Flash_Chip(device->ID() + ".Channel." + std::to_string(channel_cntr) + ".Chip." + std::to_string(chip_cntr),
 																		channel_cntr, chip_cntr, parameters->Flash_Parameters.Flash_Technology, parameters->Flash_Parameters.Die_No_Per_Chip, parameters->Flash_Parameters.Plane_No_Per_Die,
 																		parameters->Flash_Parameters.Block_No_Per_Plane, parameters->Flash_Parameters.Page_No_Per_Block,
-																		read_latencies, write_latencies, parameters->Flash_Parameters.Block_Erase_Latency,
+																		read_latencies, subpage_read_latencies, write_latencies, parameters->Flash_Parameters.Block_Erase_Latency,
 																		parameters->Flash_Parameters.Suspend_Program_Time, parameters->Flash_Parameters.Suspend_Erase_Time);
 					Simulator->AddObject(chips[chip_cntr]); //Each simulation object (a child of MQSimEngine::Sim_Object) should be added to the engine
 				}
@@ -112,7 +118,9 @@ SSD_Device::SSD_Device(Device_Parameter_Set *parameters, std::vector<IO_Flow_Par
 		default:
 			throw std::invalid_argument("No implementation is available for the specified flash communication protocol");
 		}
+		//latencies are deleted here, so make sure to pass them to the flash chips before this.
 		delete[] read_latencies;
+		delete[] subpage_read_latencies;
 		delete[] write_latencies;
 
 		//Steps 4 - 8: create FTL components and connect them together

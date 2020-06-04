@@ -24,7 +24,7 @@ namespace NVM
 			Flash_Chip(const sim_object_id_type&, flash_channel_ID_type channelID, flash_chip_ID_type localChipID,
 				Flash_Technology_Type flash_technology, 
 				unsigned int dieNo, unsigned int PlaneNoPerDie, unsigned int Block_no_per_plane, unsigned int Page_no_per_block,
-				sim_time_type *readLatency, sim_time_type subpageReadLatency, sim_time_type *programLatency, sim_time_type eraseLatency,
+				sim_time_type *readLatency, sim_time_type *subpageReadLatency, sim_time_type *programLatency, sim_time_type eraseLatency,
 				sim_time_type suspendProgramLatency, sim_time_type suspendEraseLatency,
 				sim_time_type commProtocolDelayRead = 20, sim_time_type commProtocolDelayWrite = 0, sim_time_type commProtocolDelayErase = 0);
 			~Flash_Chip();
@@ -100,7 +100,7 @@ namespace NVM
 					case CMD_READ_PAGE_COPYBACK_MULTIPLANE:
 						return _readLatency[latencyType] + _RBSignalDelayRead;
 					case CMD_READ_PAGE_SUB:
-					    return _readSubpageLatency + _RBSignalDelayRead;
+					    return _readSubpageLatency[latencyType] + _RBSignalDelayRead; //_RBSignalDelayRead = commProtocolDelayRead = 20 by default. Seems reasonable to keep this the same for subpage reads.
 					case CMD_PROGRAM_PAGE:
 					case CMD_PROGRAM_PAGE_MULTIPLANE:
 					case CMD_PROGRAM_PAGE_COPYBACK:
@@ -129,7 +129,7 @@ namespace NVM
 			unsigned int plane_no_in_die;                  //indicate how many planes in a die
 			unsigned int block_no_in_plane;                //indicate how many blocks in a plane
 			unsigned int page_no_per_block;                 //indicate how many pages in a block
-			sim_time_type *_readLatency, *_programLatency, _readSubpageLatency, _eraseLatency;
+			sim_time_type *_readLatency, *_programLatency, *_readSubpageLatency, _eraseLatency;
 			sim_time_type _suspendProgramLatency, _suspendEraseLatency;
 			sim_time_type _RBSignalDelayRead, _RBSignalDelayWrite, _RBSignalDelayErase;
 			sim_time_type lastTransferStart;

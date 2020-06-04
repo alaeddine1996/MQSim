@@ -10,7 +10,7 @@ namespace NVM
 		Flash_Chip::Flash_Chip(const sim_object_id_type& id, flash_channel_ID_type channelID, flash_chip_ID_type localChipID,
 			Flash_Technology_Type flash_technology, 
 			unsigned int dieNo, unsigned int PlaneNoPerDie, unsigned int Block_no_per_plane, unsigned int Page_no_per_block,
-			sim_time_type* readLatency, sim_time_type subpageReadLatency, sim_time_type* programLatency, sim_time_type eraseLatency,
+			sim_time_type* readLatency, sim_time_type *subpageReadLatency, sim_time_type* programLatency, sim_time_type eraseLatency,
 			sim_time_type suspendProgramLatency, sim_time_type suspendEraseLatency,
 			sim_time_type commProtocolDelayRead, sim_time_type commProtocolDelayWrite, sim_time_type commProtocolDelayErase)
 			: NVM_Chip(id), ChannelID(channelID), ChipID(localChipID), flash_technology(flash_technology),
@@ -24,11 +24,13 @@ namespace NVM
 			int bits_per_cell = static_cast<int>(flash_technology);
 			_readLatency = new sim_time_type[bits_per_cell];
 			_programLatency = new sim_time_type[bits_per_cell];
+			_readSubpageLatency = new sim_time_type[bits_per_cell];
 			for (int i = 0; i < bits_per_cell; i++) {
 				_readLatency[i] = readLatency[i];
 				_programLatency[i] = programLatency[i];
+				_readSubpageLatency[i] = subpageReadLatency[i];
 			}
-			_readSubpageLatency = subpageReadLatency;
+			
 			_eraseLatency = eraseLatency;
 			_suspendProgramLatency = suspendProgramLatency;
 			_suspendEraseLatency = suspendEraseLatency;
@@ -46,6 +48,7 @@ namespace NVM
 			}
 			delete[] Dies;
 			delete[] _readLatency;
+			delete[] _readSubpageLatency;
 			delete[] _programLatency;
 		}
 
@@ -107,6 +110,7 @@ namespace NVM
 			//If this is a simple command (not multiplane) then there should be only one address
 			if (command->Address.size() > 1
 				&& (command->CommandCode == CMD_READ_PAGE
+					|| command->CommandCode == CMD_READ_PAGE_SUB
 					|| command->CommandCode == CMD_PROGRAM_PAGE
 					|| command->CommandCode == CMD_ERASE_BLOCK)) {
 				PRINT_ERROR("Flash chip " << ID() << ": executing a flash operation on a busy die!")
