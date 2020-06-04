@@ -1,5 +1,6 @@
 #include <stdexcept>
 #include "../sim/Engine.h"
+#include <iostream>
 #include "Host_Interface_NVMe.h"
 #include "NVM_Transaction_Flash_RD.h"
 #include "NVM_Transaction_Flash_WR.h"
@@ -197,8 +198,11 @@ void Input_Stream_Manager_NVMe::segment_user_request(User_Request *user_request)
 
 		if (user_request->Type == UserRequestType::READ)
 		{
+			//Put a printout here , so you can plot Transacation Rd attributes
+            // Track transaction size 
 			NVM_Transaction_Flash_RD *transaction = new NVM_Transaction_Flash_RD(Transaction_Source_Type::USERIO, user_request->Stream_id,
 																				 transaction_size * SECTOR_SIZE_IN_BYTE, lpa, NO_PPA, user_request, user_request->Priority_class, 0, access_status_bitmap, CurrentTimeStamp);
+			cout<<"We are probing the Transaction Read within the HOST Interface, Transaction size and the read sector valid bitmap"<< transaction.data_size_in_byte/n<<"LPA"<<transaction.lpa<<"READ SECTORS BITMAP"/n<<transaction.read_sectors_bitmap;
 			user_request->Transaction_list.push_back(transaction);
 			input_streams[user_request->Stream_id]->STAT_number_of_read_transactions++;
 		}
