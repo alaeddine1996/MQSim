@@ -1,6 +1,5 @@
 #include <stdexcept>
 #include "../sim/Engine.h"
-#include <iostream>
 #include "Host_Interface_NVMe.h"
 #include "NVM_Transaction_Flash_RD.h"
 #include "NVM_Transaction_Flash_WR.h"
@@ -192,17 +191,20 @@ void Input_Stream_Manager_NVMe::segment_user_request(User_Request *user_request)
 			transaction_size = req_size - handled_sectors_count;
 		}
 		LPA_type lpa = internal_lsa / host_interface->sectors_per_page;
-
+		std::cout<<"request size"<<req_size<<"\n"<<"transaction size"<<transaction_size<<"\n";
+		std::cout<<"inteernallsa"<<(int)internal_lsa<<"\n"<<"sectors/page"<< host_interface->sectors_per_page<<"\n";
+		
 		page_status_type temp = ~(0xffffffffffffffff << (int)transaction_size);
 		access_status_bitmap = temp << (int)(internal_lsa % host_interface->sectors_per_page);
-
+                std::cout<<"access status bitmap"<<access_status_bitmap<<"\n";
+		std::cout<<"sector size in bye"<<user_request->Size_in_byte<<"\n";
 		if (user_request->Type == UserRequestType::READ)
 		{
 			//Put a printout here , so you can plot Transacation Rd attributes
             // Track transaction size 
 			NVM_Transaction_Flash_RD *transaction = new NVM_Transaction_Flash_RD(Transaction_Source_Type::USERIO, user_request->Stream_id,
 																				 transaction_size * SECTOR_SIZE_IN_BYTE, lpa, NO_PPA, user_request, user_request->Priority_class, 0, access_status_bitmap, CurrentTimeStamp);
-			cout<<"We are probing the Transaction Read within the HOST Interface, Transaction size and the read sector valid bitmap"<< transaction.data_size_in_byte/n<<"LPA"<<transaction.lpa<<"READ SECTORS BITMAP"/n<<transaction.read_sectors_bitmap;
+			std::cout<<"HOST Interface READ SECTORS BITMAP"<<transaction->read_sectors_bitmap<<"\n";
 			user_request->Transaction_list.push_back(transaction);
 			input_streams[user_request->Stream_id]->STAT_number_of_read_transactions++;
 		}
