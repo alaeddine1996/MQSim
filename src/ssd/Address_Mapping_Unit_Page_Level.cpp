@@ -588,7 +588,11 @@ namespace SSD_Components
 		if (transaction->Type == Transaction_Type::READ) {
 			if (ppa == NO_PPA) {
 				ppa = online_create_entry_for_reads(transaction->LPA, streamID, transaction->Address, ((NVM_Transaction_Flash_RD*)transaction)->read_sectors_bitmap);
-			}
+/*
+                                 std::cout<<"transl lpa to ppa"<<(NVM_Transaction_Flash_RD*)transaction->read_sectors_bitmap;
+THIS thing didn't work due to no attribute...
+			*/
+                         }
 			transaction->PPA = ppa;
 			Convert_ppa_to_address(transaction->PPA, transaction->Address);
 			block_manager->Read_transaction_issued(transaction->Address);
@@ -1653,8 +1657,8 @@ namespace SSD_Components
 			Convert_ppa_to_address(ppn, readTR->Address);
 			block_manager->Read_transaction_issued(readTR->Address);//Inform block_manager as soon as the transaction's target address is determined
 			readTR->PPA = ppn;
+			std::cout<<"readsector bitmap address mapping"<<((NVM_Transaction_Flash_RD*)readTR)->read_sectors_bitmap;
 			ftl->TSU->Submit_transaction(readTR);
-
 			Stats::Total_flash_reads_for_mapping++;
 			Stats::Total_flash_reads_for_mapping_per_stream[stream_id]++;
 
