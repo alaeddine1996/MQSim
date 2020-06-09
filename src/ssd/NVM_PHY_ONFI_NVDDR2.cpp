@@ -186,9 +186,11 @@ namespace SSD_Components {
 					dieBKE->ActiveCommand->CommandCode = CMD_READ_PAGE_SUB;
 					DEBUG("Chip " << targetChip->ChannelID << ", " << targetChip->ChipID << ", " 
 		    **/
+			  //std::cout<<"HOST Interface READ SECTORS BITMAP"<<transaction_list.read_sectors_bitmap<<"\n";
 				if (transaction_list.size() == 1) {
 					Stats::IssuedReadCMD++;
 					dieBKE->ActiveCommand->CommandCode = CMD_READ_PAGE;
+					//std::cout<<"read_sectors_bitmap send command ctrl "<<((NVM_Transaction_Flash_RD)*transaction_list.front())->read_sectors_bitmap<<"\n"; didn't work error: No such attribute affiliated too this element.
 					//Track the read bitmap sector depending on the host request size 
 					//Print out routine 
 					//printf the attribute offset and te read bitmap sector of a transaction

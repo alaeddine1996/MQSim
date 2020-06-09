@@ -54,7 +54,14 @@ public:
 		transaction_receive_slots.clear();
 	}
 
-	void Submit_transaction(NVM_Transaction_Flash *transaction)
+void Submit_transaction(NVM_Transaction_Flash *transaction)
+	{
+		transaction_receive_slots.push_back(transaction);
+		if(transaction->Transaction_Type::READ){
+		std::cout<<"read sector bitmap Submit_transaction"<<((NVM_Transaction_Flash_RD*)transaction)->read_sectors_bitmap<<"\n";
+	}
+	}
+/*	void Submit_transaction(NVM_Transaction_Flash *transaction)
 	{
 		transaction_receive_slots.push_back(transaction);
 	}
