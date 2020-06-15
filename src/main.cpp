@@ -13,7 +13,7 @@
 using namespace std;
 
 
-void command_line_args(char* argv[], string& input_file_path, string& workload_file_path)
+void command_line_args(char* argv[], string& input_file_path, string& workload_file_path, string& debug_flag)
 {
 
 	for (int arg_cntr = 1; arg_cntr < 5; arg_cntr++) {
@@ -30,6 +30,13 @@ void command_line_args(char* argv[], string& input_file_path, string& workload_f
 		if (arg.compare(0, strlen(workload_path_switch), workload_path_switch) == 0) {
 			workload_file_path.assign(argv[++arg_cntr]);
 			//cout << workload_file_path << endl;
+			continue;
+		}
+          
+        char debug_switch[] = "-d";
+		if (arg.compare(0, strlen(debug_switch), debug_switch) == 0) {
+			debug_flag = argv[++arg_cntr];
+			DEBUGF(argv[++arg_cntr]);
 			continue;
 		}
 	}
@@ -259,14 +266,14 @@ void print_help()
 
 int main(int argc, char* argv[])
 {
-	string ssd_config_file_path, workload_defs_file_path;
-	if (argc != 5) {
+	string ssd_config_file_path, workload_defs_file_path, debug_flag;
+	if (argc < 5) {
 		// MQSim expects 2 arguments: 1) the path to the SSD configuration definition file, and 2) the path to the workload definition file
 		print_help();
 		return 1;
 	}
 
-	command_line_args(argv, ssd_config_file_path, workload_defs_file_path);
+	command_line_args(argv, ssd_config_file_path, workload_defs_file_path, debug_flag);
 
 	Execution_Parameter_Set* exec_params = new Execution_Parameter_Set;
 	read_configuration_parameters(ssd_config_file_path, exec_params);
