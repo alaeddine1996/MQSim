@@ -23,15 +23,15 @@ typedef std::string sim_object_id_type;
 							std::cin.get();\
 							exit(1);\
 						 }
-#define PRINT_MESSAGE(M) std::cout << M << std::endl;
-#define DEBUG(M) //std::cout<<M<<std::endl;
-#define DEBUG2(M) //std::cout<<M<<std::endl;
 #define DEBUGF
 #ifdef DEBUGF
    #define DEBUGF(flag, str) do { if(debug_flag.find(flag) != std::string::npos){std::cout << flag <<": " << str << std::endl;} } while( false )
 #else
     #define DEBUGF(flag, str) do {} while(false)						 
-#endif   						 
+#endif 
+#define PRINT_MESSAGE(M) std::cout << M << std::endl;
+#define DEBUG(M) //std::cout<<M<<std::endl;
+#define DEBUG2(M) //std::cout<<M<<std::endl; 						 
 #define SIM_TIME_TO_MICROSECONDS_COEFF 1000
 #define SIM_TIME_TO_SECONDS_COEFF 1000000000
 #endif // !DEFINITIONS_H

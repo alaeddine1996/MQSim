@@ -4,6 +4,7 @@
 #include <string>
 #include <cstring>
 #include "ssd/SSD_Defs.h"
+#include "sim/Sim_Defs.h"
 #include "exec/Execution_Parameter_Set.h"
 #include "exec/SSD_Device.h"
 #include "exec/Host_System.h"
@@ -18,6 +19,7 @@ void command_line_args(char* argv[], string& input_file_path, string& workload_f
 
 	for (int arg_cntr = 1; arg_cntr < 5; arg_cntr++) {
 		string arg = argv[arg_cntr];
+		string test_str ;
 
 		char file_path_switch[] = "-i";
 		if (arg.compare(0, strlen(file_path_switch), file_path_switch) == 0) {
@@ -36,7 +38,7 @@ void command_line_args(char* argv[], string& input_file_path, string& workload_f
         char debug_switch[] = "-d";
 		if (arg.compare(0, strlen(debug_switch), debug_switch) == 0) {
 			debug_flag = argv[++arg_cntr];
-			DEBUGF(argv[++arg_cntr]);
+			DEBUGF(argv[++arg_cntr], test_str);
 			continue;
 		}
 	}
