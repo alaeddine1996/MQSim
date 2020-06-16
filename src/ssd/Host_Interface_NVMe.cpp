@@ -195,6 +195,9 @@ void Input_Stream_Manager_NVMe::segment_user_request(User_Request *user_request)
 
 		page_status_type temp = ~(0xffffffffffffffff << (int)transaction_size);
 		access_status_bitmap = temp << (int)(internal_lsa % host_interface->sectors_per_page);
+        
+        
+        DEBUGF( "Bitmap","access_status_bitmap"<<std::bitset<8*sizeof(access_status_bitmap )>(access_status_bitmap )<<"\n");
 
 		if (user_request->Type == UserRequestType::READ)
 		{
