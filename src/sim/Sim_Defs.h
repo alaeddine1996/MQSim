@@ -8,6 +8,10 @@
 typedef uint64_t sim_time_type;
 typedef uint16_t stream_id_type;
 typedef sim_time_type data_timestamp_type;
+class Flag{
+public:
+static std::string debug_flag;
+};
 
 #define INVALID_TIME 18446744073709551615ULL
 #define T0 0
@@ -23,9 +27,9 @@ typedef std::string sim_object_id_type;
 							std::cin.get();\
 							exit(1);\
 						 }
-#define DEBUGF
-#ifdef DEBUGF
-   #define DEBUGF(flag, str) do { if(debug_flag.find(flag) != std::string::npos){std::cout << flag <<": " << str << std::endl;} } while( false )
+#define DEBUGFLAG
+#ifdef DEBUGFLAG
+   #define DEBUGF(flag, str) do { std::cout<<"within debugf debug_flag is"<<Flag::debug_flag<<"\n"; if(Flag::debug_flag.find(flag) != std::string::npos){std::cout << flag <<": " << str << std::endl;} } while( false )
 #else
     #define DEBUGF(flag, str) do {} while(false)						 
 #endif 
