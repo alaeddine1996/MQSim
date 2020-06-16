@@ -1,5 +1,6 @@
 #include <stdexcept>
 #include "../sim/Engine.h"
+#include "../sim/Sim_Defs.h"
 #include "Host_Interface_NVMe.h"
 #include "NVM_Transaction_Flash_RD.h"
 #include "NVM_Transaction_Flash_WR.h"
