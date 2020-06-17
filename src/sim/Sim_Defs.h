@@ -29,7 +29,7 @@ typedef std::string sim_object_id_type;
 						 }
 #define DEBUGFLAG
 #ifdef DEBUGFLAG
-   #define DEBUGF(flag, str) do { std::cout<<"within debugf debug_flag is"<<Flag::debug_flag<<"\n"; if(Flag::debug_flag.find(flag) != std::string::npos){std::cout << flag <<": " << str << std::endl;} } while( false )
+   #define DEBUGF(flag, str) do {  if(Flag::debug_flag.find(flag) != std::string::npos){std::cout << flag <<": " << str << std::endl;} } while( false )
 #else
     #define DEBUGF(flag, str) do {} while(false)						 
 #endif 
