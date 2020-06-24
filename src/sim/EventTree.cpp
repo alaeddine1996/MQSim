@@ -501,4 +501,33 @@ namespace MQSimEngine
 		rbTree = SentinelNode;
 		Count = 0;
 	}
+
+	std::ostream& operator<<( std::ostream &output, EventTree &tree)
+	{
+		//TODO: implement this printing of the eventtree
+		output << "_________________________________________________________" <<std::endl;
+		output << "printing EventTree@" << Engine::Instance()->Time() << std::endl;
+		
+		//inorder traversal of the tree, printing each node
+		tree.InorderTraversal(tree.rbTree, output);
+		output << "_________________________________________________________" << std::endl;
+
+	}
+
+	void EventTree::InorderTraversal(EventTreeNode* node, std::ostream& output )
+	{
+		if(node != SentinelNode)
+		{
+			InorderTraversal(node->Left, output);
+			Sim_Event *event = node->FirstSimEvent;
+			do
+			{
+				output << "Time: " << event->Fire_time << "\tID: " << event->Target_sim_object->ID() << "\tType: " << event->Type << "\tignore: " << event->Ignore << std::endl;
+				event = event->Next_event;
+			}while (event);
+			
+			
+			InorderTraversal(node->Right, output);
+		}
+	}
 }

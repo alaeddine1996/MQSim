@@ -3,6 +3,7 @@
 
 #include "Sim_Defs.h"
 #include "Sim_Event.h"
+#include <iostream> 
 
 namespace MQSimEngine
 {
@@ -55,6 +56,8 @@ namespace MQSimEngine
 		void Remove(EventTreeNode* node);
 		void Remove_min();
 		void Clear();
+		friend std::ostream &operator<<( std::ostream &output, EventTree &tree);
+		void InorderTraversal(EventTreeNode* node, std::ostream& output );
 	private:
 		// the tree
 		EventTreeNode* rbTree;

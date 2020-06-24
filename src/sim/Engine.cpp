@@ -90,6 +90,8 @@ namespace MQSimEngine
 
 			while (ev != NULL) {
 				if(!ev->Ignore) {
+					//TODO: replace with DEBUGF as soon as that is working
+					std::cout << *_EventList << std::endl;
 					ev->Target_sim_object->Execute_simulator_event(ev);
 				}
 				Sim_Event* consumed_event = ev;
@@ -118,9 +120,10 @@ namespace MQSimEngine
 	Sim_Event* Engine::Register_sim_event(sim_time_type fireTime, Sim_Object* targetObject, void* parameters, int type)
 	{
 		Sim_Event* ev = new Sim_Event(fireTime, targetObject, parameters, type);
-		DEBUG("RegisterEvent " << fireTime << " " << targetObject)
+		// DEBUGF("Engine", "RegisterEvent " << fireTime << " " << targetObject)
 		_EventList->Insert_sim_event(ev);
 		return ev;
+
 	}
 
 	void Engine::Ignore_sim_event(Sim_Event* ev)

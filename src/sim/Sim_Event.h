@@ -3,6 +3,7 @@
 
 #include "Sim_Defs.h"
 #include "Sim_Object.h"
+#include <iostream>
 
 namespace MQSimEngine
 {
