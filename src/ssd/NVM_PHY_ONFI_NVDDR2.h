@@ -24,7 +24,7 @@ namespace SSD_Components
 	{
 	public:
 		NVM::FlashMemory::Flash_Command* ActiveCommand; //The current command that is executing on the die
-
+//
 		/*The current transactions that are being serviced. For the set of transactions in ActiveTransactions,
 		there is one ActiveCommand that is geting executed on the die. Transaction is a FTL-level concept, and
 		command is a flash chip-level concept*/

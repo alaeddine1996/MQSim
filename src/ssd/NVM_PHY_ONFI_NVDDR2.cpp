@@ -2,6 +2,7 @@
 #include "../sim/Engine.h"
 #include "NVM_PHY_ONFI_NVDDR2.h"
 #include "Stats.h"
+#include <bitset>
 
 namespace SSD_Components {
 	/*hack: using this style to emulate event/delegate*/
@@ -180,52 +181,50 @@ namespace SSD_Components {
 
 		switch (transaction_list.front()->Type) {
 			case Transaction_Type::READ:
-			// we keep transaction type but we have to add a new attribute to transaction class mentionning the subpage size
-		    /*if (transaction_list.size() == 1 && the subpage condition within the transaction) {
-					Stats::IssuedReadCMD++;
-					dieBKE->ActiveCommand->CommandCode = CMD_READ_PAGE_SUB;
-					DEBUG("Chip " << targetChip->ChannelID << ", " << targetChip->ChipID << ", " 
-		    **/
-			  //std::cout<<"HOST Interface READ SECTORS BITMAP"<<transaction_list.read_sectors_bitmap<<"\n";
-				if (transaction_list.size() == 1) {
-					Stats::IssuedReadCMD++;
-					dieBKE->ActiveCommand->CommandCode = CMD_READ_PAGE;
-					//std::cout<<"read_sectors_bitmap send command ctrl "<<((NVM_Transaction_Flash_RD)*transaction_list.front())->read_sectors_bitmap<<"\n"; didn't work error: No such attribute affiliated too this element.
-					//Track the read bitmap sector depending on the host request size 
-					//Print out routine 
-					//printf the attribute offset and te read bitmap sector of a transaction
-					//generate synthetic workload to generate smaller request that page size 
-					//page size 4Kb in  order od 16kB
-					//enable the debug message
-					//add a print routine
-					DEBUG("Chip " << targetChip->ChannelID << ", " << targetChip->ChipID << ", " << transaction_list.front()->Address.DieID << ": Sending read command to chip for LPA: " << transaction_list.front()->LPA)
-				} else {
-					Stats::IssuedMultiplaneReadCMD++;
-					dieBKE->ActiveCommand->CommandCode = CMD_READ_PAGE_MULTIPLANE;
-					DEBUG("Chip " << targetChip->ChannelID << ", " << targetChip->ChipID << ", " << transaction_list.front()->Address.DieID << ": Sending multi-plane read command to chip for LPA: " << transaction_list.front()->LPA)
-				}
+			   {			   
+				    NVM_Transaction_Flash *front = transaction_list.front();
+				    NVM_Transaction_Flash_RD *readfront = dynamic_cast<NVM_Transaction_Flash_RD *>(front);
+				    DEBUGF("Transaction", std::bitset<33>((readfront->read_sectors_bitmap-1))<<"\n");
+				    DEBUGF("Transaction", transaction_list.size()<<"\n");
+					if (transaction_list.size() == 1) {
+						 DEBUGF("Transaction", transaction_list.front()->Data_and_metadata_size_in_byte<<"\n");
+	                    // DEBUGF("Transaction", transaction_list.front()->LPA%32);
+	                     
+						Stats::IssuedReadCMD++;
+						dieBKE->ActiveCommand->CommandCode = CMD_READ_PAGE;
+						DEBUG("Chip " << targetChip->ChannelID << ", " << targetChip->ChipID << ", " << transaction_list.front()->Address.DieID << ": Sending read command to chip for LPA: " << transaction_list.front()->LPA)
+					} else {
+						DEBUGF("Transaction", transaction_list.front()->Data_and_metadata_size_in_byte<<" multi-plane"<<"\n");
+						Stats::IssuedMultiplaneReadCMD++;
+						dieBKE->ActiveCommand->CommandCode = CMD_READ_PAGE_MULTIPLANE;
+						DEBUG("Chip " << targetChip->ChannelID << ", " << targetChip->ChipID << ", " << transaction_list.front()->Address.DieID << ": Sending multi-plane read command to chip for LPA: " << transaction_list.front()->LPA)
+					}
 
-				for (std::list<NVM_Transaction_Flash*>::iterator it = transaction_list.begin();
-					it != transaction_list.end(); it++) {
-					(*it)->STAT_transfer_time += target_channel->ReadCommandTime[transaction_list.size()]; //Investigate this transfer time wheather it requires some change or not
-				}
-				if (chipBKE->OngoingDieCMDTransfers.size() == 0) {
-					targetChip->StartCMDXfer();
-					chipBKE->Status = ChipStatus::CMD_IN;
-					chipBKE->Last_transfer_finish_time = Simulator->Time() + suspendTime + target_channel->ReadCommandTime[transaction_list.size()];
-					Simulator->Register_sim_event(Simulator->Time() + suspendTime + target_channel->ReadCommandTime[transaction_list.size()], this,
-						dieBKE, (int)NVDDR2_SimEventType::READ_CMD_ADDR_TRANSFERRED);
-				} else {
-					dieBKE->DieInterleavedTime = suspendTime + target_channel->ReadCommandTime[transaction_list.size()];
-					chipBKE->Last_transfer_finish_time += suspendTime + target_channel->ReadCommandTime[transaction_list.size()];
-				}
-				chipBKE->OngoingDieCMDTransfers.push(dieBKE);
+					for (std::list<NVM_Transaction_Flash*>::iterator it = transaction_list.begin();
+						it != transaction_list.end(); it++) {
+						DEBUGF("Transaction", transaction_list.front()->Data_and_metadata_size_in_byte<<" within loop "<<"\n");	
+					    //DEBUGF("Transaction", transaction_list.front()->Data_and_metadata_size_in_byte<<"\n");
+	                    // DEBUGF("Transaction", transaction_list.front()->LPA%32<<"  "<<"within list");
+						(*it)->STAT_transfer_time += target_channel->ReadCommandTime[transaction_list.size()]; //Investigate this transfer time wheather it requires some change or not
+					}
+					if (chipBKE->OngoingDieCMDTransfers.size() == 0) {
+						targetChip->StartCMDXfer();
+						chipBKE->Status = ChipStatus::CMD_IN;
+						chipBKE->Last_transfer_finish_time = Simulator->Time() + suspendTime + target_channel->ReadCommandTime[transaction_list.size()];
+						Simulator->Register_sim_event(Simulator->Time() + suspendTime + target_channel->ReadCommandTime[transaction_list.size()], this,
+							dieBKE, (int)NVDDR2_SimEventType::READ_CMD_ADDR_TRANSFERRED);
+					} else {
+						dieBKE->DieInterleavedTime = suspendTime + target_channel->ReadCommandTime[transaction_list.size()];
+						chipBKE->Last_transfer_finish_time += suspendTime + target_channel->ReadCommandTime[transaction_list.size()];
+					}
+					chipBKE->OngoingDieCMDTransfers.push(dieBKE);
 
-				dieBKE->Expected_finish_time = chipBKE->Last_transfer_finish_time + targetChip->Get_command_execution_latency(dieBKE->ActiveCommand->CommandCode, dieBKE->ActiveCommand->Address[0].PageID);
-				if (chipBKE->Expected_command_exec_finish_time < dieBKE->Expected_finish_time) {
-					chipBKE->Expected_command_exec_finish_time = dieBKE->Expected_finish_time;
-				}
-				break;
+					dieBKE->Expected_finish_time = chipBKE->Last_transfer_finish_time + targetChip->Get_command_execution_latency(dieBKE->ActiveCommand->CommandCode, dieBKE->ActiveCommand->Address[0].PageID);
+					if (chipBKE->Expected_command_exec_finish_time < dieBKE->Expected_finish_time) {
+						chipBKE->Expected_command_exec_finish_time = dieBKE->Expected_finish_time;
+					}
+					break;
+			    }
 			case Transaction_Type::WRITE:
 				if (((NVM_Transaction_Flash_WR*)transaction_list.front())->ExecutionMode == WriteExecutionModeType::SIMPLE) {
 					if (transaction_list.size() == 1) {

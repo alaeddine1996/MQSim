@@ -1657,7 +1657,7 @@ THIS thing didn't work due to no attribute...
 			Convert_ppa_to_address(ppn, readTR->Address);
 			block_manager->Read_transaction_issued(readTR->Address);//Inform block_manager as soon as the transaction's target address is determined
 			readTR->PPA = ppn;
-			std::cout<<"readsector bitmap address mapping"<<((NVM_Transaction_Flash_RD*)readTR)->read_sectors_bitmap;
+			//std::cout<<"readsector bitmap address mapping"<<((NVM_Transaction_Flash_RD*)readTR)->read_sectors_bitmap;
 			ftl->TSU->Submit_transaction(readTR);
 			Stats::Total_flash_reads_for_mapping++;
 			Stats::Total_flash_reads_for_mapping_per_stream[stream_id]++;

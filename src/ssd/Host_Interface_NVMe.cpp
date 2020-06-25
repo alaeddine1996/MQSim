@@ -207,7 +207,7 @@ void Input_Stream_Manager_NVMe::segment_user_request(User_Request *user_request)
 
        DEBUGF( "Bitmap","lsa MOD sectors_per_page "<<(int)(internal_lsa % host_interface->sectors_per_page));
         
-        DEBUGF( "Bitmap","access_status_bitmap "<<std::bitset<16>(access_status_bitmap));
+        DEBUGF( "Bitmap","access_status_bitmap "<<std::bitset<33>(access_status_bitmap));
        
 
 		if (user_request->Type == UserRequestType::READ)
@@ -216,10 +216,10 @@ void Input_Stream_Manager_NVMe::segment_user_request(User_Request *user_request)
             // Track transaction size 
 			NVM_Transaction_Flash_RD *transaction = new NVM_Transaction_Flash_RD(Transaction_Source_Type::USERIO, user_request->Stream_id,
 																				 transaction_size * SECTOR_SIZE_IN_BYTE, lpa, NO_PPA, user_request, user_request->Priority_class, 0, access_status_bitmap, CurrentTimeStamp);
-			std::cout<<"HOST Interface READ SECTORS BITMAP"<<transaction->read_sectors_bitmap<<"\n";
+			//std::cout<<"HOST Interface READ SECTORS BITMAP"<<transaction->read_sectors_bitmap<<"\n";
 			user_request->Transaction_list.push_back(transaction);
 			input_streams[user_request->Stream_id]->STAT_number_of_read_transactions++;
-			DEBUGF( "Bitmap","read_sector_bitmap of the NVM_Transaction_Flash_RD "<<std::bitset<16>(transaction->read_sectors_bitmap)<<"\n");
+			DEBUGF( "Bitmap","read_sector_bitmap of the NVM_Transaction_Flash_RD "<<std::bitset<33>(transaction->read_sectors_bitmap)<<"\n");
 		}
 		else
 		{ //user_request->Type == UserRequestType::WRITE
