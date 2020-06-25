@@ -53,9 +53,19 @@ public:
 		}
 		transaction_receive_slots.clear();
 	}
-
+/*
+void Submit_transaction(NVM_Transaction_Flash *transaction)
+	{
+		transaction_receive_slots.push_back(transaction);
+		if(transaction->Transaction_Type::READ){
+		std::cout<<"readsector bitmap Submit_Transaction"<<((NVM_Transaction_Flash_RD*)transaction)->read_sectors_bitmap;
+	}
+	}*/
 	void Submit_transaction(NVM_Transaction_Flash *transaction)
 	{
+                //if (transaction->type == READ)
+               // NVM_Transaction_Flash_RD *ReadTR = dynamic_cast<NVM_Transaction_Flash_RD*>(transaction);
+                //std::cout<<"submit test RD"<<ReadTR->read_sectors_bitmap;
 		transaction_receive_slots.push_back(transaction);
 	}
 

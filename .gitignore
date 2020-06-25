@@ -1,3 +1,6 @@
-MQSim
 build/
-
+.vscode/
+docs
+fast18/
+workload_scenario_*.xml
+tests/
