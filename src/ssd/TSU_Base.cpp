@@ -71,6 +71,10 @@ namespace SSD_Components
 
 	bool TSU_Base::issue_command_to_chip(Flash_Transaction_Queue *sourceQueue1, Flash_Transaction_Queue *sourceQueue2, Transaction_Type transactionType, bool suspensionRequired)
 	{
+		// Transaction_dispatch_slots are the final transaction list submitted to the controller 
+		// whren we will add new features to the transaction menrtioning how a subpage read works
+		// We may add another list submitted to the controller or merge sthg within Transaction_dispatch_slots
+		
 		flash_die_ID_type dieID = sourceQueue1->front()->Address.DieID;
 		flash_page_ID_type pageID = sourceQueue1->front()->Address.PageID;
 		unsigned int planeVector = 0;

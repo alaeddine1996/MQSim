@@ -180,9 +180,24 @@ namespace SSD_Components {
 
 		switch (transaction_list.front()->Type) {
 			case Transaction_Type::READ:
+			// we keep transaction type but we have to add a new attribute to transaction class mentionning the subpage size
+		    /*if (transaction_list.size() == 1 && the subpage condition within the transaction) {
+					Stats::IssuedReadCMD++;
+					dieBKE->ActiveCommand->CommandCode = CMD_READ_PAGE_SUB;
+					DEBUG("Chip " << targetChip->ChannelID << ", " << targetChip->ChipID << ", " 
+		    **/
+			  //std::cout<<"HOST Interface READ SECTORS BITMAP"<<transaction_list.read_sectors_bitmap<<"\n";
 				if (transaction_list.size() == 1) {
 					Stats::IssuedReadCMD++;
 					dieBKE->ActiveCommand->CommandCode = CMD_READ_PAGE;
+					//std::cout<<"read_sectors_bitmap send command ctrl "<<((NVM_Transaction_Flash_RD)*transaction_list.front())->read_sectors_bitmap<<"\n"; didn't work error: No such attribute affiliated too this element.
+					//Track the read bitmap sector depending on the host request size 
+					//Print out routine 
+					//printf the attribute offset and te read bitmap sector of a transaction
+					//generate synthetic workload to generate smaller request that page size 
+					//page size 4Kb in  order od 16kB
+					//enable the debug message
+					//add a print routine
 					DEBUG("Chip " << targetChip->ChannelID << ", " << targetChip->ChipID << ", " << transaction_list.front()->Address.DieID << ": Sending read command to chip for LPA: " << transaction_list.front()->LPA)
 				} else {
 					Stats::IssuedMultiplaneReadCMD++;
@@ -192,7 +207,7 @@ namespace SSD_Components {
 
 				for (std::list<NVM_Transaction_Flash*>::iterator it = transaction_list.begin();
 					it != transaction_list.end(); it++) {
-					(*it)->STAT_transfer_time += target_channel->ReadCommandTime[transaction_list.size()];
+					(*it)->STAT_transfer_time += target_channel->ReadCommandTime[transaction_list.size()]; //Investigate this transfer time wheather it requires some change or not
 				}
 				if (chipBKE->OngoingDieCMDTransfers.size() == 0) {
 					targetChip->StartCMDXfer();
