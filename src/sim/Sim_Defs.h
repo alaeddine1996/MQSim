@@ -29,11 +29,13 @@ typedef std::string sim_object_id_type;
 						 }
 #define DEBUGFLAG
 #ifdef DEBUGFLAG
+
    #define DEBUGF(flag, str) do {  if(Flag::debug_flag.find(flag) != std::string::npos){std::cout << flag <<": " << str << std::endl;} } while( false )
 #else
     #define DEBUGF(flag, str) do {} while(false)						 
 #endif 
 #define PRINT_MESSAGE(M) std::cout << M << std::endl;
+
 #define DEBUG(M) //std::cout<<M<<std::endl;
 #define DEBUG2(M) //std::cout<<M<<std::endl; 						 
 #define SIM_TIME_TO_MICROSECONDS_COEFF 1000
