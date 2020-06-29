@@ -11,6 +11,9 @@ sim_time_type Flash_Parameter_Set::Page_Read_Latency_MSB = 75000;
 sim_time_type Flash_Parameter_Set::Page_Read_Latency_Subpage_LSB = 35000;
 sim_time_type Flash_Parameter_Set::Page_Read_Latency_Subpage_CSB = 35000;
 sim_time_type Flash_Parameter_Set::Page_Read_Latency_Subpage_MSB = 35000;
+sim_time_type Flash_Parameter_Set::Page_Read_Latency_Subpage_8KB_LSB = 50000;
+sim_time_type Flash_Parameter_Set::Page_Read_Latency_Subpage_8KB_CSB = 50000;
+sim_time_type Flash_Parameter_Set::Page_Read_Latency_Subpage_8KB_MSB = 50000;
 sim_time_type Flash_Parameter_Set::Page_Program_Latency_LSB = 750000;
 sim_time_type Flash_Parameter_Set::Page_Program_Latency_CSB = 750000;
 sim_time_type Flash_Parameter_Set::Page_Program_Latency_MSB = 750000;
@@ -92,6 +95,19 @@ void Flash_Parameter_Set::XML_serialize(Utils::XmlWriter& xmlwriter)
 	attr = "Page_Read_Latency_Subpage_MSB";
 	val = std::to_string(Page_Read_Latency_Subpage_MSB);
 	xmlwriter.Write_attribute_string(attr, val);
+    
+    attr = "Page_Read_Latency_Subpage_8KB_LSB";
+	val = std::to_string(Page_Read_Latency_Subpage_8KB_LSB);
+	xmlwriter.Write_attribute_string(attr, val);
+
+	attr = "Page_Read_Latency_Subpage_8KB_CSB";
+	val = std::to_string(Page_Read_Latency_Subpage_8KB_CSB);
+	xmlwriter.Write_attribute_string(attr, val);
+
+	attr = "Page_Read_Latency_Subpage_8KB_MSB";
+	val = std::to_string(Page_Read_Latency_Subpage_8KB_MSB);
+	xmlwriter.Write_attribute_string(attr, val);
+
 
 	attr = "Page_Program_Latency_LSB";
 	val = std::to_string(Page_Program_Latency_LSB);
@@ -194,6 +210,15 @@ void Flash_Parameter_Set::XML_deserialize(rapidxml::xml_node<> *node)
 			} else if (strcmp(param->name(), "Page_Read_Latency_Subpage_MSB") == 0) {
 				std::string val = param->value();
 				Page_Read_Latency_Subpage_MSB = std::stoull(val);
+			} else if (strcmp(param->name(), "Page_Read_Latency_Subpage_8KB_LSB") == 0) {
+				std::string val = param->value();
+				Page_Read_Latency_Subpage_8KB_LSB = std::stoull(val);
+			} else if (strcmp(param->name(), "Page_Read_Latency_Subpage_8KB_CSB") == 0) {
+				std::string val = param->value();
+				Page_Read_Latency_Subpage_8KB_CSB = std::stoull(val);
+			} else if (strcmp(param->name(), "Page_Read_Latency_Subpage_8KB_MSB") == 0) {
+				std::string val = param->value();
+				Page_Read_Latency_Subpage_8KB_MSB = std::stoull(val);
 			} else if (strcmp(param->name(), "Page_Program_Latency_LSB") == 0) {
 				std::string val = param->value();
 				Page_Program_Latency_LSB = std::stoull(val);
