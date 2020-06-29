@@ -176,8 +176,8 @@ void Input_Stream_Manager_NVMe::segment_user_request(User_Request *user_request)
 	LHA_type lsa2 = user_request->Start_LBA;
 	unsigned int req_size = user_request->SizeInSectors;
     DEBUGF( "Bitmap","Initial LSA = Start_LBA"<<lsa<<"\n");
-    DEBUGF( "Bitmap","Request Size"<<req_size<<"\n");
-    DEBUGF( "Bitmap","LSA is ranged between"<<((Input_Stream_NVMe *)input_streams[user_request->Stream_id])->Start_logical_sector_address<<" and "<<((Input_Stream_NVMe *)input_streams[user_request->Stream_id])->End_logical_sector_address<<"\n");
+    //DEBUGF( "Bitmap","Request Size"<<req_size<<"\n");
+    //DEBUGF( "Bitmap","LSA is ranged between"<<((Input_Stream_NVMe *)input_streams[user_request->Stream_id])->Start_logical_sector_address<<" and "<<((Input_Stream_NVMe *)input_streams[user_request->Stream_id])->End_logical_sector_address<<"\n");
 	page_status_type access_status_bitmap = 0;
 	unsigned int handled_sectors_count = 0;
 	unsigned int transaction_size = 0;
@@ -189,11 +189,11 @@ void Input_Stream_Manager_NVMe::segment_user_request(User_Request *user_request)
 			lsa = ((Input_Stream_NVMe *)input_streams[user_request->Stream_id])->Start_logical_sector_address + (lsa % (((Input_Stream_NVMe *)input_streams[user_request->Stream_id])->End_logical_sector_address - (((Input_Stream_NVMe *)input_streams[user_request->Stream_id])->Start_logical_sector_address)));
 		}
 		LHA_type internal_lsa = lsa - ((Input_Stream_NVMe *)input_streams[user_request->Stream_id])->Start_logical_sector_address; //For each flow, all lsa's should be translated into a range starting from zero
-        DEBUGF( "Bitmap","Final LSA after ranging "<<internal_lsa<<"\n");
-        DEBUGF( "Bitmap","sectors_per_page "<<host_interface->sectors_per_page<<"\n");
-        DEBUGF( "Bitmap","LSA MOD sectors_per_page "<<(unsigned int)(lsa % host_interface->sectors_per_page)<<"\n");
+       // DEBUGF( "Bitmap","Final LSA after ranging "<<internal_lsa<<"\n");
+       //DEBUGF( "Bitmap","sectors_per_page "<<host_interface->sectors_per_page<<"\n");
+       // DEBUGF( "Bitmap","LSA MOD sectors_per_page "<<(unsigned int)(lsa % host_interface->sectors_per_page)<<"\n");
 		transaction_size = host_interface->sectors_per_page - (unsigned int)(lsa % host_interface->sectors_per_page);
-		DEBUGF( "Bitmap","transaction_size = sectors_per_page - (LSA MOD sectors_per_page)  "<<transaction_size<<"\n");
+		//DEBUGF( "Bitmap","transaction_size = sectors_per_page - (LSA MOD sectors_per_page)  "<<transaction_size<<"\n");
 		if (handled_sectors_count + transaction_size >= req_size)
 		{
 			transaction_size = req_size - handled_sectors_count;
@@ -202,10 +202,10 @@ void Input_Stream_Manager_NVMe::segment_user_request(User_Request *user_request)
 		LPA_type lpa = internal_lsa / host_interface->sectors_per_page;
 
 		page_status_type temp = ~(0xffffffffffffffff << (int)transaction_size);
-		DEBUGF( "Bitmap","temp "<<temp<<"\n");
+		//DEBUGF( "Bitmap","temp "<<temp<<"\n");
 		access_status_bitmap = temp << (int)(internal_lsa % host_interface->sectors_per_page);
 
-       DEBUGF( "Bitmap","lsa MOD sectors_per_page "<<(int)(internal_lsa % host_interface->sectors_per_page));
+       //DEBUGF( "Bitmap","lsa MOD sectors_per_page "<<(int)(internal_lsa % host_interface->sectors_per_page));
         
         DEBUGF( "Bitmap","access_status_bitmap "<<std::bitset<33>(access_status_bitmap));
        
@@ -223,6 +223,7 @@ void Input_Stream_Manager_NVMe::segment_user_request(User_Request *user_request)
 		}
 		else
 		{ //user_request->Type == UserRequestType::WRITE
+		    DEBUGF("Bitmap","else WR");
 			NVM_Transaction_Flash_WR *transaction = new NVM_Transaction_Flash_WR(Transaction_Source_Type::USERIO, user_request->Stream_id,
 																				 transaction_size * SECTOR_SIZE_IN_BYTE, lpa, user_request, user_request->Priority_class, 0, access_status_bitmap, CurrentTimeStamp);
 			user_request->Transaction_list.push_back(transaction);
@@ -231,7 +232,7 @@ void Input_Stream_Manager_NVMe::segment_user_request(User_Request *user_request)
 
 		lsa = lsa + transaction_size;
 		handled_sectors_count += transaction_size;
-		DEBUGF( "Bitmap","IF second lsa takes + transaction size"<<lsa<<"\n");
+		//DEBUGF( "Bitmap","IF second lsa takes + transaction size"<<lsa<<"\n");
 
 	}
 }

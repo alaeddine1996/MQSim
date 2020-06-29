@@ -184,13 +184,15 @@ namespace SSD_Components {
 			   {			   
 				    NVM_Transaction_Flash *front = transaction_list.front();
 				    NVM_Transaction_Flash_RD *readfront = dynamic_cast<NVM_Transaction_Flash_RD *>(front);
-				    DEBUGF("Transaction", std::bitset<33>((readfront->read_sectors_bitmap-1))<<"\n");
+				    DEBUGF("Transaction", std::bitset<32>((readfront->read_sectors_bitmap))<<"\n");
+				    DEBUGF("Transaction", readfront->read_sectors_bitmap<<"\n");
 				    DEBUGF("Transaction", transaction_list.size()<<"\n");
 					if (transaction_list.size() == 1) {
+						Stats::IssuedReadCMD++;
 						 DEBUGF("Transaction", transaction_list.front()->Data_and_metadata_size_in_byte<<"\n");
 	                    // DEBUGF("Transaction", transaction_list.front()->LPA%32);
 	                     
-						Stats::IssuedReadCMD++;
+						
 						dieBKE->ActiveCommand->CommandCode = CMD_READ_PAGE;
 						DEBUG("Chip " << targetChip->ChannelID << ", " << targetChip->ChipID << ", " << transaction_list.front()->Address.DieID << ": Sending read command to chip for LPA: " << transaction_list.front()->LPA)
 					} else {
