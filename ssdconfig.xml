@@ -52,6 +52,12 @@
 			<Page_Read_Latency_LSB>75000</Page_Read_Latency_LSB>
 			<Page_Read_Latency_CSB>75000</Page_Read_Latency_CSB>
 			<Page_Read_Latency_MSB>75000</Page_Read_Latency_MSB>
+			<Page_Read_Latency_Subpage_LSB>35000</Page_Read_Latency_Subpage_LSB>
+			<Page_Read_Latency_Subpage_LSB>35000</Page_Read_Latency_Subpage_CSB>
+			<Page_Read_Latency_Subpage_LSB>35000</Page_Read_Latency_Subpage_MSB>
+			<Page_Read_Latency_Subpage_8KB_LSB>45000</Page_Read_Latency_Subpage_8KB_LSB>
+			<Page_Read_Latency_Subpage_8KB_CSB>45000</Page_Read_Latency_Subpage_8KB_CSB>
+			<Page_Read_Latency_Subpage_8KB_MSB>45000</Page_Read_Latency_Subpage_8KB_MSB>						
 			<Page_Program_Latency_LSB>750000</Page_Program_Latency_LSB>
 			<Page_Program_Latency_CSB>750000</Page_Program_Latency_CSB>
 			<Page_Program_Latency_MSB>750000</Page_Program_Latency_MSB>

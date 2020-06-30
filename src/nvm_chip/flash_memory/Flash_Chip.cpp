@@ -121,9 +121,12 @@ namespace NVM
 			}
 
 			targetDie->Expected_finish_time = Simulator->Time() + Get_command_execution_latency(command->CommandCode, command->Address[0].PageID);
+		    DEBUGF("Flash_Chip",command->CommandCode<<" command"<<"\n");
+		    DEBUGF("Flash_Chip",Get_command_execution_latency(command->CommandCode, command->Address[0].PageID)<<"start_command_execution command readLatency"<<"\n");
 			targetDie->CommandFinishEvent = Simulator->Register_sim_event(targetDie->Expected_finish_time,
 				this, command, static_cast<int>(Chip_Sim_Event_Type::COMMAND_FINISHED));
 			targetDie->CurrentCMD = command;
+			DEBUGF("Flash_Chip",targetDie->CurrentCMD<<" command"<<"\n");
 			targetDie->Status = DieStatus::BUSY;
 			idleDieNo--;
 
@@ -141,6 +144,7 @@ namespace NVM
 			Die* targetDie = Dies[command->Address[0].DieID];
 
 			targetDie->STAT_TotalReadTime += Get_command_execution_latency(command->CommandCode, command->Address[0].PageID);
+			DEBUGF("Flash_Chip",Get_command_execution_latency(command->CommandCode, command->Address[0].PageID)<<" finish_command_execution command readLatency"<<"\n");
 			targetDie->Expected_finish_time = INVALID_TIME;
 			targetDie->CommandFinishEvent = NULL;
 			targetDie->CurrentCMD = NULL;

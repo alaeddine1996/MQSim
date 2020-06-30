@@ -185,15 +185,38 @@ namespace SSD_Components {
 				    NVM_Transaction_Flash *front = transaction_list.front();
 				    NVM_Transaction_Flash_RD *readfront = dynamic_cast<NVM_Transaction_Flash_RD *>(front);
 				    DEBUGF("Transaction", std::bitset<32>((readfront->read_sectors_bitmap))<<"\n");
-				    DEBUGF("Transaction", readfront->read_sectors_bitmap<<"\n");
-				    DEBUGF("Transaction", transaction_list.size()<<"\n");
+				    //DEBUGF("Transaction", readfront->read_sectors_bitmap<<"\n");
+				    //DEBUGF("Transaction", transaction_list.size()<<"\n");
 					if (transaction_list.size() == 1) {
 						Stats::IssuedReadCMD++;
-						 DEBUGF("Transaction", transaction_list.front()->Data_and_metadata_size_in_byte<<"\n");
+						//DEBUGF("Transaction", transaction_list.front()->Data_and_metadata_size_in_byte<<"\n");
 	                    // DEBUGF("Transaction", transaction_list.front()->LPA%32);
-	                     
+	                     switch (readfront->read_sectors_bitmap){
+                            case 4294901760: 
+	                     	case 65535:
+	                     	case 16776960:
+		                     	 {
+			                     	 dieBKE->ActiveCommand->CommandCode = CMD_READ_PAGE_SUB_8KB;
+			                     	 DEBUGF("Transaction", "8KB subpage executed "<<"\n");	
+			                     	 break;
+		                     	 }
+	                     	case 255:
+	                     	case 4278190080:
+	                     	case 16711680:
+	                     	case 65280:
+		                     	 {
+			                     	dieBKE->ActiveCommand->CommandCode = CMD_READ_PAGE_SUB;	
+			                     	DEBUGF("Transaction", " 4KB subpage executed "<<"\n");	
+			                     	break;
+		                     	}
+	                     	default:
+		                     	{
+		                     		dieBKE->ActiveCommand->CommandCode = CMD_READ_PAGE;
+		                     		DEBUGF("Transaction", " default executed "<<"\n");	
+		                     	}
+	                     }
 						
-						dieBKE->ActiveCommand->CommandCode = CMD_READ_PAGE;
+						DEBUGF("Transaction",dieBKE->ActiveCommand->CommandCode <<" command"<<"\n");
 						DEBUG("Chip " << targetChip->ChannelID << ", " << targetChip->ChipID << ", " << transaction_list.front()->Address.DieID << ": Sending read command to chip for LPA: " << transaction_list.front()->LPA)
 					} else {
 						DEBUGF("Transaction", transaction_list.front()->Data_and_metadata_size_in_byte<<" multi-plane"<<"\n");
@@ -204,27 +227,36 @@ namespace SSD_Components {
 
 					for (std::list<NVM_Transaction_Flash*>::iterator it = transaction_list.begin();
 						it != transaction_list.end(); it++) {
-						DEBUGF("Transaction", transaction_list.front()->Data_and_metadata_size_in_byte<<" within loop "<<"\n");	
+						//DEBUGF("Transaction", transaction_list.front()->Data_and_metadata_size_in_byte<<" within loop "<<"\n");	
 					    //DEBUGF("Transaction", transaction_list.front()->Data_and_metadata_size_in_byte<<"\n");
 	                    // DEBUGF("Transaction", transaction_list.front()->LPA%32<<"  "<<"within list");
 						(*it)->STAT_transfer_time += target_channel->ReadCommandTime[transaction_list.size()]; //Investigate this transfer time wheather it requires some change or not
 					}
 					if (chipBKE->OngoingDieCMDTransfers.size() == 0) {
+						//DEBUGF("Transaction"," if (chipBKE->OngoingDieCMDTransfers.size() == 0)"<<"\n");
 						targetChip->StartCMDXfer();
 						chipBKE->Status = ChipStatus::CMD_IN;
 						chipBKE->Last_transfer_finish_time = Simulator->Time() + suspendTime + target_channel->ReadCommandTime[transaction_list.size()];
 						Simulator->Register_sim_event(Simulator->Time() + suspendTime + target_channel->ReadCommandTime[transaction_list.size()], this,
 							dieBKE, (int)NVDDR2_SimEventType::READ_CMD_ADDR_TRANSFERRED);
 					} else {
+						//DEBUGF("Transaction"," else (chipBKE->OngoingDieCMDTransfers.size() == 0)"<<"\n");
 						dieBKE->DieInterleavedTime = suspendTime + target_channel->ReadCommandTime[transaction_list.size()];
 						chipBKE->Last_transfer_finish_time += suspendTime + target_channel->ReadCommandTime[transaction_list.size()];
 					}
 					chipBKE->OngoingDieCMDTransfers.push(dieBKE);
-
+                    DEBUGF("Transaction", " Command latency "<<targetChip->Get_command_execution_latency(dieBKE->ActiveCommand->CommandCode, dieBKE->ActiveCommand->Address[0].PageID)<<"\n");
 					dieBKE->Expected_finish_time = chipBKE->Last_transfer_finish_time + targetChip->Get_command_execution_latency(dieBKE->ActiveCommand->CommandCode, dieBKE->ActiveCommand->Address[0].PageID);
-					if (chipBKE->Expected_command_exec_finish_time < dieBKE->Expected_finish_time) {
+					// Investigate chipBKE->Expected_command_exec_finish_time and why this conditionof updating the value with dieBKE,
+					//why inferior only we will put as different
+					if (chipBKE->Expected_command_exec_finish_time != dieBKE->Expected_finish_time) {
 						chipBKE->Expected_command_exec_finish_time = dieBKE->Expected_finish_time;
 					}
+					/*  We are checking if the chip and die expected finish time are aligned. They are aligned
+					  
+                    */
+                    DEBUGF("Transaction", " dieBKE finish time "<<dieBKE->Expected_finish_time <<"\n");
+					DEBUGF("Transaction", " chipBKE finish time "<<chipBKE->Expected_command_exec_finish_time <<"\n");
 					break;
 			    }
 			case Transaction_Type::WRITE:
@@ -510,6 +542,8 @@ namespace SSD_Components {
 
 		switch (command->CommandCode)
 		{
+	    case CMD_READ_PAGE_SUB_8KB:
+	    case CMD_READ_PAGE_SUB:
 		case CMD_READ_PAGE:
 		case CMD_READ_PAGE_MULTIPLANE:
 			DEBUG("Chip " << chip->ChannelID << ", " << chip->ChipID << ": finished  read command")
@@ -698,6 +732,8 @@ namespace SSD_Components {
 			chipBKE->PrepareResume();
 			chip->Resume(dieBKE->ActiveCommand->Address[0].DieID);
 			switch (dieBKE->ActiveCommand->CommandCode) {
+				case CMD_READ_PAGE_SUB:
+				case CMD_READ_PAGE_SUB_8KB:
 				case CMD_READ_PAGE:
 				case CMD_READ_PAGE_MULTIPLANE:
 				case CMD_READ_PAGE_COPYBACK:

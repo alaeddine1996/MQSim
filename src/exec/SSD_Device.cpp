@@ -32,7 +32,7 @@ SSD_Device::SSD_Device(Device_Parameter_Set *parameters, std::vector<IO_Flow_Par
 	{
 	case NVM::NVM_Type::FLASH:
 	{
-		sim_time_type *read_latencies, *write_latencies, *subpage_read_latencies;
+		sim_time_type *read_latencies, *write_latencies, *subpage_read_latencies,*subpage_8KB_read_latencies;
 		sim_time_type average_flash_read_latency = 0, average_flash_write_latency = 0; //Required for FTL initialization
 
 		//Step 1: create memory chips (flash chips in our case)
