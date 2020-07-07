@@ -208,7 +208,7 @@ void Input_Stream_Manager_NVMe::segment_user_request(User_Request *user_request)
        //DEBUGF( "Bitmap","lsa MOD sectors_per_page "<<(int)(internal_lsa % host_interface->sectors_per_page));
         
         DEBUGF( "Bitmap","access_status_bitmap "<<std::bitset<32>(access_status_bitmap));
-       
+         DEBUGF( "Bitmap","access_status_bitmap "<<access_status_bitmap);
 
 		if (user_request->Type == UserRequestType::READ)
 		{

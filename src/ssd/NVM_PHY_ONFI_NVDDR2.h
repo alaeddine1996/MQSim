@@ -9,7 +9,8 @@
 #include "NVM_PHY_ONFI.h"
 #include "ONFI_Channel_NVDDR2.h"
 #include "Flash_Transaction_Queue.h"
-
+#include "Host_Interface_Base.h"
+// we import Host_interface because it contains the sectors_per_page
 namespace SSD_Components
 {
 	enum class NVDDR2_SimEventType
@@ -93,7 +94,26 @@ namespace SSD_Components
 		void Setup_triggers();
 		void Validate_simulation_config();
 		void Start_simulation();
-
+        int subpage_size = 8;
+        int page_size = 32;
+        std::list<long> subpages_bitmap;
+        //std::list<long> calculate_sub_bitmap(int subpage_size, int page_size);
+        //long calculate_sub_bitmap(int subpage_size, int page_size, int p);
+        void calculate_sub_bitmap(int subpage_size, int page_size);
+        void assign_bitmap(int i, long s) { 
+        	//int p= 0;
+        	//int i;
+        	 //for (i=0;i<4;i++)
+        	 //{
+        	 	subpages_bitmap.assign(i,s);
+        	 	//p += 8;
+        	// }
+        	}
+        // Assign to a list or a vector the clean bitmaps that you will be comparing to 
+        //You will iterate this list in send command to chip
+        //As a void with cppand access the sub_bitmap list as general variable, an attribute within NVM_PHY_ONFI_NVDDR2
+        //std::list<int> sub_bitmap;
+        // = calculate_sub_bitmap(subpage_size,host_interface->sectors_per_page)
 		void Send_command_to_chip(std::list<NVM_Transaction_Flash*>& transactionList);
 		void Change_flash_page_status_for_preconditioning(const NVM::FlashMemory::Physical_Page_Address& page_address, const LPA_type lpa);
 		void Execute_simulator_event(MQSimEngine::Sim_Event*);

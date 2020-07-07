@@ -3,6 +3,9 @@
 #include "NVM_PHY_ONFI_NVDDR2.h"
 #include "Stats.h"
 #include <bitset>
+#include <cmath>
+#include <list> 
+
 
 namespace SSD_Components {
 	/*hack: using this style to emulate event/delegate*/
@@ -129,8 +132,67 @@ namespace SSD_Components {
 		channels[page_address.ChannelID]->Chips[page_address.ChipID]->Change_memory_status_preconditioning(&page_address, &lpa);
 	}
 	
+	//std::list<long> NVM_PHY_ONFI_NVDDR2::calculate_sub_bitmap(int subpage_size, int page_size)
+	//it should be calculating the redsectors bitmao that we need to match
+	// then we call another void that will assign these calculated values to the list attribute that will dtore these bitmaps
+	void NVM_PHY_ONFI_NVDDR2::calculate_sub_bitmap(int subpage_size, int page_size)
+	// add nrb of levels as an argument
+    {   
+    	subpages_bitmap.clear();
+    	std::list<long> sub_bitmap;
+    	int i,j,step,nbr_page;
+    	int p = 0;
+    	long sum = 0; 
+    	nbr_page =  page_size/subpage_size;
+    	int ps = subpage_size;
+    	for (i=0;i<nbr_page;i++)
+    	{
+    		DEBUGF("list","bitmap p"<<p);
+    		sum = 0;
+    		for (j=0;j<8;j++)
+    		{
+				sum += pow(2,(p+j));
+				//DEBUGF("list","bitmap pow"<<sum);
+				DEBUGF("list","bitmap p+j"<<(p+j));
+			}		
+			DEBUGF("list","bitmap pow"<<sum);
+			sub_bitmap.push_back(sum);
+			//assign_bitmap(i,sum);
+
+			subpages_bitmap.push_back(sum);
+			p += 8;
+			
+			
+    	}
+    	for (auto &sbit : subpages_bitmap)
+    	{
+		 DEBUGF("list","list bitmap list"<<sbit);
+		}
+    	//return(sub_bitmap);    	
+		/*if (nbr_level == 0)
+		{
+	      break;
+		} else {
+			step = pow(nbr_level-1 );
+			for (j=0 ; j< ratio/step ; j += step)
+			{
+			     for (i=0 ; i < step ; i++)
+			     {
+			       sum += sub_bitmap[]
+			     }
+			     sub_bitmap_X.push_back(sum);	
+		    }
+		}
+
+		*/
+    } 
+
+
+
 	void NVM_PHY_ONFI_NVDDR2::Send_command_to_chip(std::list<NVM_Transaction_Flash*>& transaction_list)
 	{
+		
+         calculate_sub_bitmap(subpage_size,page_size);
 		ONFI_Channel_NVDDR2* target_channel = channels[transaction_list.front()->Address.ChannelID];
 
 		NVM::FlashMemory::Flash_Chip* targetChip = target_channel->Chips[transaction_list.front()->Address.ChipID];
@@ -178,7 +240,8 @@ namespace SSD_Components {
 			metadata.LPA = (*it)->LPA;
 			dieBKE->ActiveCommand->Meta_data.push_back(metadata);
 		}
-
+        
+       
 		switch (transaction_list.front()->Type) {
 			case Transaction_Type::READ:
 			   {			   
@@ -191,19 +254,26 @@ namespace SSD_Components {
 						Stats::IssuedReadCMD++;
 						//DEBUGF("Transaction", transaction_list.front()->Data_and_metadata_size_in_byte<<"\n");
 	                    // DEBUGF("Transaction", transaction_list.front()->LPA%32);
-	                     switch (readfront->read_sectors_bitmap){
-                            case 4294901760: 
-	                     	case 65535:
-	                     	case 16776960:
+	                     
+
+	                     // with an IF you can do the comparaison and make sure if the bitmap fits the range
+	                 
+
+	                   switch (readfront->read_sectors_bitmap){
+                            case 4294901760: //11111111111111110000000000000000 
+	                     	case 65535:      //00000000000000001111111111111111
+	                     	case 16776960:   //00000000111111111111111100000000
 		                     	 {
+		                     	 	DEBUGF("Transaction", "8KB subpage executed "<<"\n");	
+
 			                     	 dieBKE->ActiveCommand->CommandCode = CMD_READ_PAGE_SUB_8KB;
-			                     	 DEBUGF("Transaction", "8KB subpage executed "<<"\n");	
+			                     	 //DEBUGF("Transaction", "8KB subpage executed "<<"\n");	
 			                     	 break;
 		                     	 }
-	                     	case 255:
-	                     	case 4278190080:
-	                     	case 16711680:
-	                     	case 65280:
+	                     	case 255:        //00000000000000000000000011111111
+	                     	case 4278190080: //11111111000000000000000000000000
+	                     	case 16711680:   //00000000111111110000000000000000
+	                     	case 65280:      //00000000000000001111111100000000
 		                     	 {
 			                     	dieBKE->ActiveCommand->CommandCode = CMD_READ_PAGE_SUB;	
 			                     	DEBUGF("Transaction", " 4KB subpage executed "<<"\n");	
@@ -215,9 +285,34 @@ namespace SSD_Components {
 		                     		DEBUGF("Transaction", " default executed "<<"\n");	
 		                     	}
 	                     }
-						
+	                     DEBUGF("Transaction", " read_sectors_bitmap list"<<subpages_bitmap.front()<<"\n");
+						DEBUGF("Transaction", " read_sectors_bitmap list"<<subpages_bitmap.back()<<"\n");
 						DEBUGF("Transaction",dieBKE->ActiveCommand->CommandCode <<" command"<<"\n");
 						DEBUG("Chip " << targetChip->ChannelID << ", " << targetChip->ChipID << ", " << transaction_list.front()->Address.DieID << ": Sending read command to chip for LPA: " << transaction_list.front()->LPA)
+					  
+                    //std::list<long>::iterator it;
+						//DEBUGF("Transaction", " read_sectors_bitmap list"<<subpages_bitmap.front()<<"\n");
+					   //for (it = subpages_bitmap.begin(); it != subpages_bitmap.end(); it++)
+					 /*
+					   for (auto  &sbit : subpages_bitmap)
+						  {
+					    //   {
+					       	DEBUGF("Transaction", " read_sectors_bitmap list"<<sbit<<"\n");
+					        bool flag ;
+							if (readfront->read_sectors_bitmap == sbit )
+	                            {
+
+	                             dieBKE->ActiveCommand->CommandCode = CMD_READ_PAGE_SUB;	
+	                             DEBUGF("Transaction", " read_sectors_bitmap list"<<sbit<<"\n");
+				                 DEBUGF("Transaction", " 4KB subpage executed "<<"\n");	
+				                 flag = true;
+	                           }
+	                        //DEBUGF("Transaction", " still iterating "<<"\n");
+	                        if (flag){
+	                        	break;
+	                          }	
+                           }
+                           */
 					} else {
 						DEBUGF("Transaction", transaction_list.front()->Data_and_metadata_size_in_byte<<" multi-plane"<<"\n");
 						Stats::IssuedMultiplaneReadCMD++;
@@ -238,7 +333,7 @@ namespace SSD_Components {
 						chipBKE->Status = ChipStatus::CMD_IN;
 						chipBKE->Last_transfer_finish_time = Simulator->Time() + suspendTime + target_channel->ReadCommandTime[transaction_list.size()];
 						Simulator->Register_sim_event(Simulator->Time() + suspendTime + target_channel->ReadCommandTime[transaction_list.size()], this,
-							dieBKE, (int)NVDDR2_SimEventType::READ_CMD_ADDR_TRANSFERRED);
+							dieBKE, (int)NVDDR2_SimEventType::READ_CMD_ADDR_TRANSFERRED);		
 					} else {
 						//DEBUGF("Transaction"," else (chipBKE->OngoingDieCMDTransfers.size() == 0)"<<"\n");
 						dieBKE->DieInterleavedTime = suspendTime + target_channel->ReadCommandTime[transaction_list.size()];
