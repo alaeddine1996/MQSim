@@ -100,7 +100,7 @@ namespace SSD_Components
         //std::list<long> calculate_sub_bitmap(int subpage_size, int page_size);
         //long calculate_sub_bitmap(int subpage_size, int page_size, int p);
         void calculate_sub_bitmap(int subpage_size, int page_size);
-        void assign_bitmap(int i, long s) { 
+       /* void assign_bitmap(int i, long s) { 
         	//int p= 0;
         	//int i;
         	 //for (i=0;i<4;i++)
@@ -109,6 +109,7 @@ namespace SSD_Components
         	 	//p += 8;
         	// }
         	}
+        	*/
         // Assign to a list or a vector the clean bitmaps that you will be comparing to 
         //You will iterate this list in send command to chip
         //As a void with cppand access the sub_bitmap list as general variable, an attribute within NVM_PHY_ONFI_NVDDR2

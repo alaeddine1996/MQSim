@@ -52,6 +52,8 @@ namespace SSD_Components {
 		for (unsigned int i = 0; i < channel_count; i++) {
 			for (unsigned int j = 0; j < chip_no_per_channel; j++) {
 				channels[i]->Chips[j]->Connect_to_chip_ready_signal(handle_ready_signal_from_chip);
+
+
 			}
 		}
 	}
@@ -258,7 +260,7 @@ namespace SSD_Components {
 
 	                     // with an IF you can do the comparaison and make sure if the bitmap fits the range
 	                 
-
+                       
 	                   switch (readfront->read_sectors_bitmap){
                             case 4294901760: //11111111111111110000000000000000 
 	                     	case 65535:      //00000000000000001111111111111111
@@ -294,11 +296,14 @@ namespace SSD_Components {
 						//DEBUGF("Transaction", " read_sectors_bitmap list"<<subpages_bitmap.front()<<"\n");
 					   //for (it = subpages_bitmap.begin(); it != subpages_bitmap.end(); it++)
 					 /*
+					 bool flag = false ;
 					   for (auto  &sbit : subpages_bitmap)
 						  {
 					    //   {
 					       	DEBUGF("Transaction", " read_sectors_bitmap list"<<sbit<<"\n");
-					        bool flag ;
+					        
+					        while ( flag == false)
+					        {
 							if (readfront->read_sectors_bitmap == sbit )
 	                            {
 
@@ -308,11 +313,9 @@ namespace SSD_Components {
 				                 flag = true;
 	                           }
 	                        //DEBUGF("Transaction", " still iterating "<<"\n");
-	                        if (flag){
-	                        	break;
-	                          }	
+	                       }
                            }
-                           */
+                          */
 					} else {
 						DEBUGF("Transaction", transaction_list.front()->Data_and_metadata_size_in_byte<<" multi-plane"<<"\n");
 						Stats::IssuedMultiplaneReadCMD++;
