@@ -268,7 +268,8 @@ namespace SSD_Components {
 		                     	 {
 		                     	 	DEBUGF("Transaction", "8KB subpage executed "<<"\n");	
 
-			                     	 dieBKE->ActiveCommand->CommandCode = CMD_READ_PAGE_SUB_8KB;
+			                     	dieBKE->ActiveCommand->CommandCode = CMD_READ_PAGE_SUB_8KB;
+
 			                     	 //DEBUGF("Transaction", "8KB subpage executed "<<"\n");	
 			                     	 break;
 		                     	 }
@@ -278,6 +279,7 @@ namespace SSD_Components {
 	                     	case 65280:      //00000000000000001111111100000000
 		                     	 {
 			                     	dieBKE->ActiveCommand->CommandCode = CMD_READ_PAGE_SUB;	
+			                     
 			                     	DEBUGF("Transaction", " 4KB subpage executed "<<"\n");	
 			                     	break;
 		                     	}
