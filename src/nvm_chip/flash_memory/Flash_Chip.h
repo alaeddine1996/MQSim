@@ -99,6 +99,7 @@ namespace NVM
 					case CMD_READ_PAGE_COPYBACK:
 					case CMD_READ_PAGE_COPYBACK_MULTIPLANE:
 						return _readLatency[latencyType] + _RBSignalDelayRead;
+				// adding subpage commands to address the corresponding latency		
 					case CMD_READ_PAGE_SUB:
 					    return _readSubpageLatency[latencyType] + _RBSignalDelayRead; //_RBSignalDelayRead = commProtocolDelayRead = 20 by default. Seems reasonable to keep this the same for subpage reads.
 					case CMD_READ_PAGE_SUB_8KB:

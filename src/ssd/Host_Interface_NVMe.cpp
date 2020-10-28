@@ -169,7 +169,8 @@ inline void Input_Stream_Manager_NVMe::inform_host_request_completed(stream_id_t
 		((Input_Stream_NVMe *)input_streams[stream_id])->Completion_tail = 0;
 	}
 }
-
+// Segment_user_request splits the received request (trace) into transaction by filling its diffreent attributes
+//probing the LBA  and request size will give an idea how the read_sectors_bitmap is affected
 void Input_Stream_Manager_NVMe::segment_user_request(User_Request *user_request)
 {
 	LHA_type lsa = user_request->Start_LBA;

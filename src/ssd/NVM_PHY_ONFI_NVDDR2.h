@@ -94,6 +94,8 @@ namespace SSD_Components
 		void Setup_triggers();
 		void Validate_simulation_config();
 		void Start_simulation();
+       	/*************** Trying to build generic repartition of subpage reads hierarchy, the user selects the page size
+	and the number of subpage levels , and the rest generates automatically.
         int subpage_size = 8;
         int page_size = 32;
         std::list<long> subpages_bitmap;

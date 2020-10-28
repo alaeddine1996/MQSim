@@ -1,5 +1,13 @@
 # MQSim: A Simulator for Modern NVMe and SATA SSDs
 
+## Subpage Read
+Imec and ETh Zurich collaborated together to investigate the subpage Read in SSD.
+So, we did some modifications to implement this functionality in MQSim
+The modified files are:
+1. We declared in Flash_command.h the new subpage Read  commands of 8KB and 4KB
+2. We adjusted the command related functions to these two new commands in Flash_chip.h
+3. In NVM_PHY_ONFI_NVDDR2.cpp, the send_command_to_chip is a key function where we modified how the Read transactions are processed to generate commands to Flash chips.
+We access the attribute read_sectors_bitmap within the RD transaction. According to its value we multiplex the corresponding Read command. 
 
 ## Usage in Linux
 Run following commands:

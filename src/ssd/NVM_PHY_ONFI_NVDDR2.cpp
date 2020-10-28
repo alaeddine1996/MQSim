@@ -133,7 +133,10 @@ namespace SSD_Components {
 	{
 		channels[page_address.ChannelID]->Chips[page_address.ChipID]->Change_memory_status_preconditioning(&page_address, &lpa);
 	}
-	
+
+	/*************** Trying to build generic repartition of subpage reads hierarchy, the user selects the page size
+	and the number of subpage levels , and the rest generates automatically.
+
 	//std::list<long> NVM_PHY_ONFI_NVDDR2::calculate_sub_bitmap(int subpage_size, int page_size)
 	//it should be calculating the redsectors bitmao that we need to match
 	// then we call another void that will assign these calculated values to the list attribute that will dtore these bitmaps
@@ -186,10 +189,15 @@ namespace SSD_Components {
 		    }
 		}
 
-		*/
+		
     } 
+    */
 
 
+/************ This fuction translates transactions into commands, When it comes to RD transactions 
+              we access the attribute read_sectors_bitmap in RD transactions. According to its value we
+              multiplex the matching Read command to the Flash Chip. In the Flash chip the corresponding latencies
+              are calculated according to the received commands. We added latencies specific to subpage reads.********/
 
 	void NVM_PHY_ONFI_NVDDR2::Send_command_to_chip(std::list<NVM_Transaction_Flash*>& transaction_list)
 	{
@@ -260,7 +268,7 @@ namespace SSD_Components {
 
 	                     // with an IF you can do the comparaison and make sure if the bitmap fits the range
 	                 
-                       
+                 //8KB Subpage Read      
 	                   switch (readfront->read_sectors_bitmap){
                             case 4294901760: //11111111111111110000000000000000 
 	                     	case 65535:      //00000000000000001111111111111111
@@ -273,6 +281,7 @@ namespace SSD_Components {
 			                     	 //DEBUGF("Transaction", "8KB subpage executed "<<"\n");	
 			                     	 break;
 		                     	 }
+		           //4KB Subpage Read           	 
 	                     	case 255:        //00000000000000000000000011111111
 	                     	case 4278190080: //11111111000000000000000000000000
 	                     	case 16711680:   //00000000111111110000000000000000
@@ -283,6 +292,7 @@ namespace SSD_Components {
 			                     	DEBUGF("Transaction", " 4KB subpage executed "<<"\n");	
 			                     	break;
 		                     	}
+		           // else normal (full size) page read          	
 	                     	default:
 		                     	{
 		                     		dieBKE->ActiveCommand->CommandCode = CMD_READ_PAGE;
@@ -293,7 +303,10 @@ namespace SSD_Components {
 						DEBUGF("Transaction", " read_sectors_bitmap list"<<subpages_bitmap.back()<<"\n");
 						DEBUGF("Transaction",dieBKE->ActiveCommand->CommandCode <<" command"<<"\n");
 						DEBUG("Chip " << targetChip->ChannelID << ", " << targetChip->ChipID << ", " << transaction_list.front()->Address.DieID << ": Sending read command to chip for LPA: " << transaction_list.front()->LPA)
-					  
+	
+	/*************** Trying to build generic repartition of subpage reads hierarchy, the user selects the page size
+	and the number of subpage levels , and the rest generates automatically.
+
                     //std::list<long>::iterator it;
 						//DEBUGF("Transaction", " read_sectors_bitmap list"<<subpages_bitmap.front()<<"\n");
 					   //for (it = subpages_bitmap.begin(); it != subpages_bitmap.end(); it++)
